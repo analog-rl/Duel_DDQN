@@ -23,6 +23,7 @@ sys.argv += ['--gym_record', 'th']
 ```
 
 **Change list / Todo**
+
 [x] fix - train on target_model (was on model)
 [x] fix - memory buffer is infinite
 [x] fix - DDQN: Updating weights was happening every frame
