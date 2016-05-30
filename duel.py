@@ -142,12 +142,7 @@ for i_episode in xrange(args.episodes):
                 if args.verbose > 0:
                     print 'timestep:', timestep, 'DDQN: Updating weights'
                 weights = model.get_weights()
-                target_weights = target_model.get_weights()
-                for i in xrange(len(weights)):
-                    weights[i] *= args.tau
-                    target_weights[i] *= (1 - args.tau)
-                    target_weights[i] += weights[i]
-                target_model.set_weights(target_weights)
+                target_model.set_weights(weights)
 
         if done:
             break
