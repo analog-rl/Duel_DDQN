@@ -23,11 +23,10 @@ sys.argv += ['--gym_record', 'th']
 ```
 
 **Change list / Todo**
-
-[x] fix - train on target_model (was on model)
-[x] fix - memory buffer is infinite
-[x] fix - DDQN: Updating weights was happening every frame
-[ ] ?? - investigate if batch should be every frame (or every X timestep)
-[ ] remove HACK - batch_size is 10 (just pass a parameter)
-[ ] remove HACK - memory bugger size is hard coded 
-[ ] remove HACK - DDQN: Updating weights update interval is hardcoded
+- [x] fix - train on target_model (was on model)
+- [x] fix - memory buffer is infinite
+- [x] fix - DDQN: Updating weights was happening every frame
+- [ ] ?? - investigate if batch should be every frame (or every X timestep)
+- [ ] remove HACK - batch_size is 10 (just pass a parameter)
+- [ ] remove HACK - memory bugger size is hard coded 
+- [ ] remove HACK - DDQN: Updating weights update interval is hardcoded
