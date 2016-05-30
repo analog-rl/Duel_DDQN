@@ -1,4 +1,4 @@
-*note - in progress; i found some bugs in @tambetm's code*
+**note - in progress; i found some bugs in @tambetm's code**
 
 Used dueling network architecture with Q-learning, as outlined in this paper:
 
@@ -21,7 +21,8 @@ sys.argv += ['--gamma', '0.995']
 sys.argv += ['--no_display']
 sys.argv += ['--gym_record', 'th']
 ```
-*Change list / Todo*
+
+**Change list / Todo**
 [x] fix - train on target_model (was on model)
 [x] fix - memory buffer is infinite
 [x] fix - DDQN: Updating weights was happening every frame
