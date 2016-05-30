@@ -19,7 +19,9 @@ sys.argv = ['duel.py']
 sys.argv += ['CartPole-v0']
 sys.argv += ['--gamma', '0.995']
 sys.argv += ['--no_display']
+sys.argv += ['--batch_size', '100']
 sys.argv += ['--gym_record', 'th']
+sys.argv += ['--verbose', '1']
 ```
 
 **Change list / Todo**
@@ -27,6 +29,6 @@ sys.argv += ['--gym_record', 'th']
 - [x] fix - memory buffer is infinite
 - [x] fix - DDQN: Updating weights was happening every frame
 - [ ] ?? - investigate if batch should be every frame (or every X timestep)
-- [ ] remove HACK - batch_size is 10 (just pass a parameter)
+- [x] remove HACK - batch_size is 10 (just pass a parameter)
 - [ ] remove HACK - memory bugger size is hard coded 
 - [ ] remove HACK - DDQN: Updating weights update interval is hardcoded

@@ -35,7 +35,7 @@ def createLayers():
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--verbose', type=int, default=0)
-parser.add_argument('--batch_size', type=int, default=10)
+parser.add_argument('--batch_size', type=int, default=100)
 parser.add_argument('--hidden_size', type=int, default=100)
 parser.add_argument('--layers', type=int, default=1)
 parser.add_argument('--batch_norm', action="store_true", default=False)
