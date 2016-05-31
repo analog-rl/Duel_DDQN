@@ -8,8 +8,8 @@ http://arxiv.org/abs/1511.06581
 
 Command line:
 ```
-# python duel.py CartPole-v0 --gamma 0.995 # note - i will double check this once finish debuing
-# 
+python duel.py CartPole-v0 --gamma 0.995 --no_display --batch_size 100 --gym_record th
+ 
 ```
 
 from code:
