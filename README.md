@@ -1,4 +1,4 @@
-**note - in progress; i found some bugs in @tambetm's code**
+**note - in progress; I branched @tambetm's gist; I've fixed some issues and trying to get it closer to the paper. Pull request / help is welcome!!**
 
 Used dueling network architecture with Q-learning, as outlined in this paper:
 
@@ -24,11 +24,5 @@ sys.argv += ['--gym_record', 'th']
 sys.argv += ['--verbose', '1']
 ```
 
-**Change list / Todo**
-- [x] fix - train on target_model (was on model)
-- [x] fix - memory buffer is infinite
-- [x] fix - DDQN: Updating weights was happening every frame
-- [ ] ?? - investigate if batch should be every frame (or every X timestep)
-- [x] remove HACK - batch_size is 10 (just pass a parameter)
-- [ ] remove HACK - memory buffer size is hard coded 
-- [ ] remove HACK - DDQN: Updating weights update interval is hardcoded
+**Orginally based on:- **
+https://gist.github.com/tambetm/0bd29b14d76b85946422b79f3a87df70 - https://gym.openai.com/evaluations/eval_sOUmkzSy26GIWJ5IIQeA#reproducibility
