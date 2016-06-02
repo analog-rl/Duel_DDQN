@@ -1,4 +1,4 @@
-#Duel_DDQN V1
+#Duel_DDQN V0.2
 
 based on **Dueling Network Architectures for Deep Reinforcement Learning**  
 *Ziyu Wang, Tom Schaul, Matteo Hessel, Hado van Hasselt, Marc Lanctot, Nando de Freitas*  
