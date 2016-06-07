@@ -14,7 +14,7 @@ def createLayers():
         h = BatchNormalization()(x)
     else:
         h = x
-    for i in xrange(args.layers):
+    for i in range(args.layers):
         h = Dense(args.hidden_size, activation=args.activation)(h)
         if args.batch_norm and i != args.layers - 1:
             h = BatchNormalization()(h)
@@ -82,23 +82,23 @@ terminals = []
 total_reward = 0
 timestep = 0
 
-for i_episode in xrange(args.episodes):
+for i_episode in range(args.episodes):
     observation = env.reset()
     episode_reward = 0
-    for t in xrange(args.max_timesteps):
+    for t in range(args.max_timesteps):
         if args.display:
             env.render()
 
         if np.random.random() < args.exploration:
             action = env.action_space.sample()
             if args.verbose > 0:
-                print "e:", i_episode, "e.t:", t, "action:", action, "random"
+                print("e:", i_episode, "e.t:", t, "action:", action, "random")
         else:
             s = np.array([observation])
             q = model.predict(s, batch_size=1)
             action = np.argmax(q[0])
             if args.verbose > 0:
-                print "e:", i_episode, "e.t:", t, "action:", action, "q:", q
+                print("e:", i_episode, "e.t:", t, "action:", action, "q:", q)
 
         if len(prestates) >= 100000:
             delidx = np.random.randint(0, len(prestates) - 1 - args.batch_size)
@@ -114,7 +114,7 @@ for i_episode in xrange(args.episodes):
         observation, reward, done, info = env.step(action)
         episode_reward += reward
         if args.verbose > 1:
-            print "reward:", reward
+            print("reward:", reward)
 
         rewards.append(reward)
         poststates.append(observation)
@@ -123,7 +123,7 @@ for i_episode in xrange(args.episodes):
         timestep += 1
 
         if len(prestates) > args.min_train:
-            for k in xrange(args.train_repeat):
+            for k in range(args.train_repeat):
                 if len(prestates) > args.batch_size:
                     indexes = np.random.choice(len(prestates), size=args.batch_size)
                 else:
@@ -131,7 +131,7 @@ for i_episode in xrange(args.episodes):
 
                 qpre = model.predict(np.array(prestates)[indexes])
                 qpost = target_model.predict(np.array(poststates)[indexes])
-                for i in xrange(len(indexes)):
+                for i in range(len(indexes)):
                     if terminals[indexes[i]]:
                         qpre[i, actions[indexes[i]]] = rewards[indexes[i]]
                     else:
@@ -140,17 +140,17 @@ for i_episode in xrange(args.episodes):
 
             if timestep % 1000 == 0:
                 if args.verbose > 0:
-                    print 'timestep:', timestep, 'DDQN: Updating weights'
+                    print('timestep:', timestep, 'DDQN: Updating weights')
                 weights = model.get_weights()
                 target_model.set_weights(weights)
 
         if done:
             break
 
-    print "Episode {} finished after {} timesteps, episode reward {}".format(i_episode + 1, t + 1, episode_reward)
+    print("Episode {} finished after {} timesteps, episode reward {}".format(i_episode + 1, t + 1, episode_reward))
     total_reward += episode_reward
 
-print "Average reward per episode {}".format(total_reward / args.episodes)
+print("Average reward per episode {}".format(total_reward / args.episodes))
 
 if args.gym_record:
     env.monitor.close()
