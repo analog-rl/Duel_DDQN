@@ -35,16 +35,16 @@ def createLayers():
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--verbose', type=int, default=0)
-parser.add_argument('--batch_size', type=int, default=100)
+parser.add_argument('--batch_size', type=int, default=32)
 parser.add_argument('--hidden_size', type=int, default=100)
 parser.add_argument('--layers', type=int, default=1)
 parser.add_argument('--batch_norm', action="store_true", default=False)
 parser.add_argument('--no_batch_norm', action="store_false", dest='batch_norm')
-parser.add_argument('--min_train', type=int, default=10)
+parser.add_argument('--replay_start_size', type=int, default=50000)
 parser.add_argument('--train_repeat', type=int, default=10)
 parser.add_argument('--gamma', type=float, default=0.99)
 parser.add_argument('--tau', type=float, default=0.001)
-parser.add_argument('--episodes', type=int, default=200)
+parser.add_argument('--episodes', type=int, default=1000)
 parser.add_argument('--max_timesteps', type=int, default=200)
 parser.add_argument('--activation', choices=['tanh', 'relu'], default='tanh')
 parser.add_argument('--optimizer', choices=['adam', 'rmsprop'], default='adam')
@@ -54,6 +54,10 @@ parser.add_argument('--advantage', choices=['naive', 'max', 'avg'], default='nai
 parser.add_argument('--display', action='store_true', default=True)
 parser.add_argument('--no_display', dest='display', action='store_false')
 parser.add_argument('--gym_record')
+parser.add_argument('--update_frequency', type=int, default=4)
+parser.add_argument('--target_net_update_frequency', type=int, default=32)
+parser.add_argument('--replay_memory_size', type=int, default=1000000)
+
 parser.add_argument('environment')
 args = parser.parse_args()
 
@@ -89,7 +93,7 @@ for i_episode in range(args.episodes):
         if args.display:
             env.render()
 
-        if np.random.random() < args.exploration:
+        if timestep < args.replay_start_size or np.random.random() < args.exploration:
             action = env.action_space.sample()
             if args.verbose > 0:
                 print("e:", i_episode, "e.t:", t, "action:", action, "random")
@@ -100,7 +104,7 @@ for i_episode in range(args.episodes):
             if args.verbose > 0:
                 print("e:", i_episode, "e.t:", t, "action:", action, "q:", q)
 
-        if len(prestates) >= 100000:
+        if len(prestates) >= args.replay_memory_size:
             delidx = np.random.randint(0, len(prestates) - 1 - args.batch_size)
             del prestates[delidx]
             del actions[delidx]
@@ -122,27 +126,39 @@ for i_episode in range(args.episodes):
 
         timestep += 1
 
-        if len(prestates) > args.min_train:
-            for k in range(args.train_repeat):
-                if len(prestates) > args.batch_size:
-                    indexes = np.random.choice(len(prestates), size=args.batch_size)
-                else:
-                    indexes = range(len(prestates))
-
-                qpre = model.predict(np.array(prestates)[indexes])
-                qpost = target_model.predict(np.array(poststates)[indexes])
-                for i in range(len(indexes)):
-                    if terminals[indexes[i]]:
-                        qpre[i, actions[indexes[i]]] = rewards[indexes[i]]
+        if timestep > args.replay_start_size:
+            if timestep % args.update_frequency == 0:
+                for k in xrange(args.train_repeat):
+                    if len(prestates) > args.batch_size:
+                        # indexes = range(args.batch_size)
+                        # indexes = np.random.choice(len(prestates), size=args.batch_size)
+                        indexes = np.random.randint(len(prestates), size=args.batch_size)
                     else:
-                        qpre[i, actions[indexes[i]]] = rewards[indexes[i]] + args.gamma * np.amax(qpost[i])
-                model.train_on_batch(np.array(prestates)[indexes], qpre)
+                        indexes = range(len(prestates))
 
-            if timestep % 1000 == 0:
+                    pre_sample = np.array([prestates[i] for i in indexes])
+                    post_sample = np.array([poststates[i] for i in indexes])
+                    qpre = model.predict(pre_sample)
+                    qpost = target_model.predict(post_sample)
+                    for i in xrange(len(indexes)):
+                        if terminals[indexes[i]]:
+                            qpre[i, actions[indexes[i]]] = rewards[indexes[i]]
+                        else:
+                            qpre[i, actions[indexes[i]]] = rewards[indexes[i]] + args.gamma * np.amax(qpost[i])
+                    model.train_on_batch(pre_sample, qpre)
+
+            if timestep % args.target_net_update_frequency == 0:
                 if args.verbose > 0:
                     print('timestep:', timestep, 'DDQN: Updating weights')
                 weights = model.get_weights()
                 target_model.set_weights(weights)
+                    # weights = model.get_weights()
+                    # target_weights = target_model.get_weights()
+                    # for i in xrange(len(weights)):
+                    #     weights[i] *= args.tau
+                    #     target_weights[i] *= (1 - args.tau)
+                    #     target_weights[i] += weights[i]
+                    # target_model.set_weights(target_weights)
 
         if done:
             break
