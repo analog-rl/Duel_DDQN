@@ -6,7 +6,7 @@ based on **Dueling Network Architectures for Deep Reinforcement Learning**
 
 run
 ```
-python duel.py CartPole-v0 --gamma 0.995 --no_display --batch_size 100 --gym_record th
+python duel.py CartPole-v0 --no_display --episodes 200 --replay_start_size 0 --gym_record ../th
 ```
 results / Params
 - v0.2 <https://gym.openai.com/algorithms/alg_zy3YHp0RTVOq6VXpocB20g>
