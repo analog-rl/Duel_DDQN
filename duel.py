@@ -48,8 +48,9 @@ parser.add_argument('--episodes', type=int, default=1000)
 parser.add_argument('--max_timesteps', type=int, default=200)
 parser.add_argument('--activation', choices=['tanh', 'relu'], default='tanh')
 parser.add_argument('--optimizer', choices=['adam', 'rmsprop'], default='adam')
-# parser.add_argument('--optimizer_lr', type=float, default=0.001)
-parser.add_argument('--exploration', type=float, default=0.1)
+parser.add_argument('--ep_start', type=float, default=1)
+parser.add_argument('--ep_end', type=float, default=0.1)
+parser.add_argument('--ep_endt', type=float, default=1000000)
 parser.add_argument('--advantage', choices=['naive', 'max', 'avg'], default='naive')
 parser.add_argument('--display', action='store_true', default=True)
 parser.add_argument('--no_display', dest='display', action='store_false')
@@ -85,6 +86,7 @@ terminals = []
 
 total_reward = 0
 timestep = 0
+train_steps = 0
 
 for i_episode in range(args.episodes):
     observation = env.reset()
@@ -93,16 +95,18 @@ for i_episode in range(args.episodes):
         if args.display:
             env.render()
 
-        if timestep < args.replay_start_size or np.random.random() < args.exploration:
+        ep = args.ep_end + (args.ep_start - args.ep_end) * max(0, args.ep_endt - train_steps) / args.ep_endt
+
+        if timestep < args.replay_start_size or np.random.random() < ep:
             action = env.action_space.sample()
             if args.verbose > 0:
-                print("e:", i_episode, "e.t:", t, "action:", action, "random")
+                print "e:", i_episode, "e.t:", t, "action:", action, "random", " ep:", ep
         else:
             s = np.array([observation])
             q = model.predict(s, batch_size=1)
             action = np.argmax(q[0])
             if args.verbose > 0:
-                print("e:", i_episode, "e.t:", t, "action:", action, "q:", q)
+                print "e:", i_episode, "e.t:", t, "action:", action, "q:", q, " ep:", ep
 
         if len(prestates) >= args.replay_memory_size:
             delidx = np.random.randint(0, len(prestates) - 1 - args.batch_size)
@@ -127,6 +131,7 @@ for i_episode in range(args.episodes):
         timestep += 1
 
         if timestep > args.replay_start_size:
+            train_steps += 1
             if timestep % args.update_frequency == 0:
                 for k in xrange(args.train_repeat):
                     if len(prestates) > args.batch_size:
