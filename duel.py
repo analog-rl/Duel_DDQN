@@ -5,6 +5,7 @@ from keras.models import Model
 from keras.layers import Input, Dense, Lambda
 from keras.layers.normalization import BatchNormalization
 from keras import backend as K
+from keras.optimizers import Adam, RMSprop
 import numpy as np
 
 
@@ -44,6 +45,7 @@ parser.add_argument('--replay_start_size', type=int, default=50000)
 parser.add_argument('--train_repeat', type=int, default=10)
 parser.add_argument('--gamma', type=float, default=0.99)
 parser.add_argument('--tau', type=float, default=0.001)
+parser.add_argument('--learning_rate', type=float, default=0.00025)
 parser.add_argument('--episodes', type=int, default=1000)
 parser.add_argument('--max_timesteps', type=int, default=200)
 parser.add_argument('--activation', choices=['tanh', 'relu'], default='tanh')
@@ -72,7 +74,9 @@ if args.gym_record:
 x, z = createLayers()
 model = Model(input=x, output=z)
 model.summary()
-model.compile(optimizer='adam', loss='mse')
+optimizer = Adam(lr=args.learning_rate)
+# optimizer = RMSprop(lr=args.learning_rate)
+model.compile(optimizer=optimizer, loss='mse')
 
 x, z = createLayers()
 target_model = Model(input=x, output=z)
