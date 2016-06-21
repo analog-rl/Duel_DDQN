@@ -6,17 +6,22 @@ from keras.layers import Input, Dense, Lambda
 from keras.layers.normalization import BatchNormalization
 from keras import backend as K
 from keras.optimizers import Adam, RMSprop
+from keras import initializations
 import numpy as np
 
 
 def createLayers():
+    # def custom_init(shape, scale=0.01, name=None):
+    #   return K.variable(np.random.normal(loc=0.0, scale=scale,  size=shape),
+    #                     name=name)
+    custom_init = lambda shape, name: initializations.normal(shape, scale=0.01, name=name)
     x = Input(shape=env.observation_space.shape)
     if args.batch_norm:
         h = BatchNormalization()(x)
     else:
         h = x
     for i in range(args.layers):
-        h = Dense(args.hidden_size, activation=args.activation)(h)
+        h = Dense(args.hidden_size, activation=args.activation, init=custom_init)(h)
         if args.batch_norm and i != args.layers - 1:
             h = BatchNormalization()(h)
     y = Dense(env.action_space.n + 1)(h)
